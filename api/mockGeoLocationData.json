@@ -1,0 +1,29 @@
+[
+    {
+        "name": "Rotterdam",
+        "local_names": {
+            "uk": "Роттердам",
+            "la": "Roterodamum",
+            "ru": "Роттердам",
+            "oc": "Rotterdam",
+            "pt": "Roterdão",
+            "zh": "鹿特丹",
+            "eo": "Roterdamo",
+            "ar": "روتردام",
+            "ko": "로테르담",
+            "en": "Rotterdam",
+            "nl": "Rotterdam",
+            "sr": "Ротердам",
+            "tt": "Роттердам",
+            "de": "Rotterdam",
+            "mk": "Ротердам",
+            "es": "Róterdam",
+            "lt": "Roterdamas",
+            "lv": "Roterdama"
+        },
+        "lat": 51.9244424,
+        "lon": 4.47775,
+        "country": "NL",
+        "state": "South Holland"
+    }
+]

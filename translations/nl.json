@@ -1,0 +1,28 @@
+{
+    "search": {
+      "placeholder": "Zoek op stad",
+      "label": "zoek locatie",
+      "suggestion": "Zoek aub op een stad of locatie",
+      "retrieved": "Laatst opgehaald op",
+      "use": "Gebruik"
+    },
+    "status": {
+      "error": "Oeps, er ging iets mist, probeer het later nog een keer..."
+    },
+    "weather": {
+      "temperature": "Temperatuur",
+      "wind": "Wind",
+      "rain": "Regen",
+      "snow": "Sneeuw",
+      "sun": "Zon",
+      "feels_like": "Voelt als",
+      "temp_min": "Min temperatuur",
+      "temp_max": "Max temperatuur",
+      "speed": "Snelheid",
+      "direction": "Richting",
+      "1h": "Afgelopen uur",
+      "3h": "Afgelopen 3 uur",
+      "sunrise": "Zonsopgang",
+      "sunset": "Zonsondergang"
+    }
+  }

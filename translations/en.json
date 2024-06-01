@@ -1,0 +1,28 @@
+{
+    "search": {
+      "placeholder": "Search on city",
+      "label": "search location",
+      "suggestion": "Please search on a city or location",
+      "retrieved": "Last retrieved at",
+      "use": "Use"
+    },
+    "status": {
+      "error": "Oops, something went wrong, please try again later..."
+    },
+    "weather": {
+      "temperature": "Temperature",
+      "wind": "Wind",
+      "rain": "Rain",
+      "snow": "Snow",
+      "sun": "Sun",
+      "feels_like": "Feels like",
+      "temp_min": "Min temperature",
+      "temp_max": "Max temperature",
+      "speed": "Speed",
+      "direction": "Direction",
+      "1h": "Past hour",
+      "3h": "Past 3 hours",
+      "sunrise": "Sunrise",
+      "sunset": "Sunset"
+    }
+}
