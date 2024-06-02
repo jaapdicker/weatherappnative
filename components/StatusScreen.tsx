@@ -25,6 +25,7 @@ export const StatusScreen = (props: Props) => {
 const styles = StyleSheet.create({
     center: {
         flex: 1,
+        width: '100%',
         justifyContent: 'center',
         alignItems: 'center',
     }
