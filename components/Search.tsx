@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
-import { GestureResponderEvent, StyleSheet, TouchableOpacity, TextInput, TextInputProps, TextInputComponent } from 'react-native';
+import { GestureResponderEvent, StyleSheet, TextInput, Pressable } from 'react-native';
+import { SearchBar } from 'react-native-screens';
 import { useTranslation } from 'react-i18next';
 import { useWeatherStore } from '@/hooks/useWeatherStore';
 import { STATUS } from '@/types';
@@ -35,9 +36,9 @@ export const Search = () => {
                 autoFocus
                 style={styles.input}
             />
-            <TouchableOpacity onPress={handleSearch} style={styles.iconButton}>
+            <Pressable onPress={handleSearch} style={styles.iconButton}>
                 <Icon name="search" size={20} color="gray" />
-            </TouchableOpacity>
+            </Pressable>
         </ThemedView>
     )
 }
@@ -46,7 +47,7 @@ const styles = StyleSheet.create({
     inputGroup: {
         flexDirection: 'row',
         alignItems: 'center',
-        maxWidth: "80%",
+        padding: 20,
     },
     input: {
         flex: 1,

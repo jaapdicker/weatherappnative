@@ -1,4 +1,5 @@
 {
+  "translation": {
     "search": {
       "placeholder": "Search on city",
       "label": "search location",
@@ -25,4 +26,5 @@
       "sunrise": "Sunrise",
       "sunset": "Sunset"
     }
+  }
 }

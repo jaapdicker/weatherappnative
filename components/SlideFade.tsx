@@ -1,5 +1,9 @@
-import { useRef, useEffect } from "react";
-import { Animated } from 'react-native';
+import Animated, {
+    withTiming,
+    withDelay,
+    useSharedValue,
+    useAnimatedStyle,
+}  from 'react-native-reanimated';
 
 type Props = {
     children: JSX.Element | JSX.Element[],
@@ -10,30 +14,32 @@ type Props = {
 };
 
 export const SlideFade = ({ children, duration = 250, delay = 0, offsetY = -10, styles }: Props) => {
-    const slideAnim = useRef(new Animated.Value(offsetY)).current;
-    const fadeAnim = useRef(new Animated.Value(0)).current;
+    const slideAnim = useSharedValue(offsetY);
+    const fadeAnim = useSharedValue(0)
 
-    useEffect(() => {
-        Animated.parallel([
-            Animated.timing(slideAnim, {
-                toValue: 0,
-                duration: duration,
-                delay: delay * 1000,
-                useNativeDriver: true,
-            }),
-            Animated.timing(fadeAnim, {
-                toValue: 1,
-                duration: duration,
-                delay: delay * 1000,
-                useNativeDriver: true,
-            })
-        ]).start();
-    }, [slideAnim, fadeAnim, delay]);
+    slideAnim.value = withDelay(
+        delay * 1000,
+        withTiming(0, {
+            duration: duration,
+        })
+        );
+    fadeAnim.value = withDelay(
+        delay * 1000,
+        withTiming(1, {
+            duration: duration,
+        })
+    );
+
+    const animatedStyle = useAnimatedStyle(() => {
+        return {
+            transform: [{ translateY: slideAnim.value }],
+            opacity: fadeAnim.value,
+        };
+    });
 
     return (
         <Animated.View style={{
-            transform: [{ translateY: slideAnim }],
-            opacity: fadeAnim,
+            ...animatedStyle,
             ...styles
         }}>
             {children}

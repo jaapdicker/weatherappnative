@@ -5,13 +5,22 @@ import { getFirstOrDefault, timestampMinutesPast } from "@/utilities";
 import { deviceLanguage } from '@/i18n';
 
 export const useWeatherStore = create<WeatherState>((set, get) => ({
-    language: deviceLanguage,
+    language: deviceLanguage || 'en',
+    geoLocation: undefined,
     location: undefined,
     weather: undefined,
     timestamp: undefined,
     status: undefined,
     errorMessage: undefined,
     selectedUnits: "metric",
+    setGeoLocation: (newGeoLocation: GeoLocationData) => {
+        const { geoLocation } = get();
+        if (geoLocation !== newGeoLocation) {
+            set({
+                geoLocation: newGeoLocation
+            })
+        }
+    },
     setLanguage: (newLanguage: string) => {
         set({
             language: newLanguage
@@ -33,22 +42,44 @@ export const useWeatherStore = create<WeatherState>((set, get) => ({
         }
     },
     setStatusMessage: (message: string) => {
-        set({
-            errorMessage: message,
-        })
+        const { errorMessage } = get();
+        if (errorMessage !== message) {
+            set({
+                errorMessage: message,
+            })
+        }
     },
     setLocation: (location: string) => {
         set({ location });
     },
-    getWeather: async (loc?: string, forceFetch: boolean = false) => {
+    getGeoLocation: async (location: string): Promise<void> => {
+        const { setStatus, setStatusMessage } = get();
+
+        await getGeoLocationData(location).then(response => {
+            const data = response as unknown as GeoLocationData[];
+            const geoData = getFirstOrDefault(data);
+            set({
+                location: geoData.name,
+                geoLocation: geoData
+            })
+        }).catch((e: Error) => {
+            setStatusMessage(e.message);
+            setStatus(STATUS.error);
+        });
+    },
+    getWeather: async (loc?: string, forceFetch: boolean = false): Promise<void> => {
         const {
             location,
             setStatus,
+            geoLocation,
+            setGeoLocation,
             selectedUnits,
             timestamp,
             language,
         } = get();
 
+        let geoData = geoLocation;
+        
         if (
             (!location ||
             location !== loc ||
@@ -57,46 +88,48 @@ export const useWeatherStore = create<WeatherState>((set, get) => ({
             loc
         ) {
             setStatus(STATUS.loading);
-
             try {
-                // get geoLocationData
-                const geoLocationData = getGeoLocationData(loc)
-                    .then((response: Response): GeoLocationData[] => {
-                        const data = response.json() as unknown as GeoLocationData[];
-                        return data;
+                if (!geoLocation) {
+                    await getGeoLocationData(loc).then((response: Response): void => {
+                        const data = response as unknown as GeoLocationData[];
+                        geoData = getFirstOrDefault(data);
+                        setGeoLocation(geoData);
+                    }).catch((e: Error) => {
+                        set({
+                            errorMessage: e.message,
+                            status: STATUS.error
+                        })
                     });
+                }
 
-                // get weather once geoLocation is
-                geoLocationData
-                    .then((geoLocation: GeoLocationData[]) => {
-                        const { lat, lon, name } = getFirstOrDefault(geoLocation);
-                        
-                        if (!lat || !lon) {
-                            return false;
-                        }
-
-                        const weatherData = getWeatherData(lat, lon, selectedUnits, language)
-                            .then((response: Response): WeatherData => {
-                                const weather = response.json() as unknown as WeatherData;
-                                return weather;
-                            });
-                        
-                        Promise.resolve(weatherData).then((weather: WeatherData) => {
-                            set(({
-                                weather,
-                                location: name,
-                                timestamp: Date.now(),
-                                status: STATUS.success,
-                            }));
-                        });
+                const { lat, lon, name } = geoData!;
+                
+                if (!lat || !lon) {
+                    return;
+                }
+                
+                await getWeatherData(lat, lon, selectedUnits, language)
+                    .then((response: Response): void => {
+                        const weather = response as unknown as WeatherData;
+                        set(({
+                            weather: weather,
+                            location: name,
+                            timestamp: Date.now(),
+                            status: STATUS.success,
+                        }));
                     })
-            } catch (error) {
-                const e = error as Error;
-                set(({
+                    .catch((e: Error) => {
+                        set({
+                            errorMessage: e.message,
+                            status: STATUS.error
+                        })
+                    });
+            } catch (e: any) {
+                set({
+                    errorMessage: e.errorMessage,
                     status: STATUS.error,
-                    errorMessage: e.cause as string,
-                }));
+                })
             }
-        }
+        } 
     }
 }));

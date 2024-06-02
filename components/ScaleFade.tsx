@@ -1,5 +1,9 @@
-import { useRef, useEffect } from "react";
-import { Animated } from 'react-native';
+import Animated, {
+    withTiming,
+    withDelay,
+    useSharedValue,
+    useAnimatedStyle,
+}  from 'react-native-reanimated';
 
 type Props = {
     children: JSX.Element | JSX.Element[],
@@ -9,30 +13,32 @@ type Props = {
 };
 
 export const ScaleFade = ({ children, duration = 500, delay = 0, styles }: Props) => {
-    const scaleAnim = useRef(new Animated.Value(0)).current;
-    const fadeAnim = useRef(new Animated.Value(0)).current;
+    const scaleAnim = useSharedValue(0);
+    const fadeAnim = useSharedValue(0);
 
-    useEffect(() => {
-        Animated.parallel([
-            Animated.timing(scaleAnim, {
-                toValue: 1,
-                duration: duration,
-                delay: delay * 1000,
-                useNativeDriver: true,
-            }),
-            Animated.timing(fadeAnim, {
-                toValue: 1,
-                duration: duration,
-                delay: delay * 1000,
-                useNativeDriver: true,
-            })
-        ]).start();
-    }, [scaleAnim, fadeAnim, delay]);
+    scaleAnim.value = withDelay(
+        delay * 1000,
+        withTiming(1, {
+            duration
+        })
+    )
+    fadeAnim.value = withDelay(
+        delay * 1000,
+        withTiming(1, {
+            duration
+        })
+    )
+
+    const animatedStyle = useAnimatedStyle(() => {
+        return {
+            transform: [{ scale: scaleAnim.value }],
+            opacity: fadeAnim.value,
+        }
+    })
 
     return (
         <Animated.View style={{
-            transform: [{ scale: scaleAnim }],
-            opacity: fadeAnim,
+            ...animatedStyle,
             ...styles
         }}>
             {children}
