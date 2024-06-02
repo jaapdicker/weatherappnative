@@ -1,6 +1,5 @@
 import { useState, useRef } from 'react';
-import { GestureResponderEvent, StyleSheet, TextInput, Pressable } from 'react-native';
-import { SearchBar } from 'react-native-screens';
+import { GestureResponderEvent, StyleSheet, TextInput, Pressable, Keyboard } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useWeatherStore } from '@/hooks/useWeatherStore';
 import { STATUS } from '@/types';
@@ -19,11 +18,10 @@ export const Search = () => {
     }
 
     const handleSearch = (e: GestureResponderEvent) => {
-        e.preventDefault();
+        Keyboard.dismiss();
         if (status !== STATUS.loading) {
             getWeather(value);
         }
-        inputRef.current?.focus();
     };
 
     return (

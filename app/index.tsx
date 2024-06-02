@@ -1,4 +1,4 @@
-import { Image, StyleSheet, SectionList, ScrollView, SafeAreaView, FlatList, StatusBar } from "react-native";
+import { Image, StyleSheet, SectionList, Platform, KeyboardAvoidingView } from "react-native";
 import { useTranslation } from 'react-i18next';
 
 import { ThemedView } from "@/components/ThemedView";
@@ -12,17 +12,17 @@ import { STATUS, WeatherData, WeatherWeather } from '@/types';
 import { useWeatherStore } from "@/hooks/useWeatherStore";
 import { Search } from "@/components/Search";
 
+type SectionData = {
+  title: string,
+  data: {
+    [x: string]: string
+  }[],
+}[];
+
 export default function Index() {
   const { t } = useTranslation();
   const { weather, timestamp, location, status, selectedUnits, language, errorMessage } = useWeatherStore();
   const { description, icon } = getFirstOrDefault<WeatherWeather>(weather?.weather);
-
-  type SectionData = {
-    title: string,
-    data: {
-      [x: string]: string
-    }[],
-  }[];
 
   const convertWeatherData = (w: WeatherData): SectionData => {
     const returnData: SectionData = [];
@@ -110,14 +110,13 @@ export default function Index() {
   return (
     <>
       <Search />
-      <ThemedView style={styles.container}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
         {status === STATUS.loading && (
           <StatusScreen spinner />
         )}
 
         {status === STATUS.error && (
-          // <StatusScreen text={t('status.error')} />
-          <StatusScreen text={errorMessage} />
+          <StatusScreen text={t('status.error')} />
         )}
 
         {!status && (
@@ -136,83 +135,87 @@ export default function Index() {
 
             {/* weather main section */}
             {icon && description && (
-              <ScaleFade duration={500}>
-                <ThemedView style={styles.imageContainer}>
-                  <Image
-                    source={{ uri: iconUrl(icon) }}
-                    style={styles.image}
-                    alt={description}
-                    resizeMode="cover"
-                  />
-                  {weather?.main?.temp && <ThemedText type="title">{prettifyTemp(weather.main.temp, selectedUnits)}</ThemedText>}
-                  <ThemedText style={{ textAlign: 'center' }}>
-                    {description}
-                  </ThemedText>
-                </ThemedView>
-              </ScaleFade>
+              <ThemedView>
+                <ScaleFade duration={500}>
+                  <ThemedView style={styles.imageContainer}>
+                    <Image
+                      source={{ uri: iconUrl(icon) }}
+                      style={styles.image}
+                      alt={description}
+                      resizeMode="cover"
+                    />
+                    {weather?.main?.temp && <ThemedText type="title">{prettifyTemp(weather.main.temp, selectedUnits)}</ThemedText>}
+                    <ThemedText style={styles.description}>
+                      {description}
+                    </ThemedText>
+                  </ThemedView>
+                </ScaleFade>
+              </ThemedView>
             )}
 
             {/* weather details */}
             {weather && (
-              <SlideFade duration={500} offsetY={50}>
-                <SectionList
-                  sections={convertWeatherData(weather)}
-                  keyExtractor={(item, index) => item + item.key + index}
-                  renderItem={({ item, index }) => (
-                    <SlideFade delay={(0.25 * index) + 0.25}>
-                      <ThemedText style={styles.detailtext}>{Object.keys(item)}: {Object.values(item)}</ThemedText>
-                    </SlideFade>
-                  )}
-                  renderSectionHeader={({ section: { title } }) => (
-                    <ThemedText type="subtitle">{title}</ThemedText>
-                  )}
-                />
-              </SlideFade>
+              <ThemedView style={styles.details}>
+                  <SlideFade duration={500} offsetY={-50}>
+                    <SectionList
+                      sections={convertWeatherData(weather)}
+                      keyExtractor={(item, index) => item + item.key + index}
+                      renderItem={({ item, index }) => (
+                        <SlideFade delay={(0.25 * index) + 0.25}>
+                          <ThemedText style={styles.detailText}>{Object.keys(item)}: {Object.values(item)}</ThemedText>
+                        </SlideFade>
+                      )}
+                      renderSectionHeader={({ section: { title } }) => (
+                        <ThemedText type="subtitle" style={styles.detailHeader}>{title}</ThemedText>
+                      )}
+                    />
+                  </SlideFade>
+              </ThemedView>
             )}
           </ThemedView>
         )}
-      </ThemedView>
+      </KeyboardAvoidingView>
     </>
   );
 }
 
 const styles = StyleSheet.create({
   main: {
-    width: '100%',
-    height: '100%',
     flex: 1,
+    width: '100%',
     paddingHorizontal: 10,
   },
   container: {
-    width: '100%',
-    height: '100%',
     flex: 1,
     flexDirection: 'column',
-    padding: 10,
     justifyContent: "center",
     alignItems: "center",
-  },
-  imageContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center'
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 10,
   },
-  column: {
-    flex: 1,
-    flexDirection: 'column',
-    color: '#1A365D',
-    paddingHorizontal: 10,
-  },
-  detailtext: {
-    marginBottom: 5,
+  imageContainer: {
+    alignItems: 'center'
   },
   image: {
     width: 200,
     height: 200,
-  }
+  },
+  description: {
+    textAlign: 'center',
+  },
+  details: {
+    flex: 1,
+    marginTop: 20,
+  },
+  detailHeader: {
+    marginTop: 15,
+    textAlign: 'center'
+  },
+  detailText: {
+    marginTop: 5,
+    textAlign: 'center'
+  },
 })
