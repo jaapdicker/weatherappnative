@@ -82,14 +82,13 @@ export const useWeatherStore = create<WeatherState>((set, get) => ({
         
         if (
             (!location ||
-            location !== loc ||
             timestampMinutesPast(timestamp, 5000) ||
             forceFetch) &&
             loc
         ) {
             setStatus(STATUS.loading);
             try {
-                if (!geoLocation) {
+                if (!geoLocation || location !== loc) {
                     await getGeoLocationData(loc).then((response: Response): void => {
                         const data = response as unknown as GeoLocationData[];
                         geoData = getFirstOrDefault(data);
