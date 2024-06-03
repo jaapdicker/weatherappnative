@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { GestureResponderEvent, StyleSheet, TextInput, Pressable, Keyboard } from 'react-native';
+import { GestureResponderEvent, StyleSheet, TextInput, Pressable, Keyboard, useColorScheme } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useWeatherStore } from '@/hooks/useWeatherStore';
 import { STATUS } from '@/types';
@@ -32,6 +32,7 @@ export const Search = () => {
                 placeholder={t('search.placeholder')}
                 onChangeText={handleChange}
                 autoFocus
+                placeholderTextColor={useColorScheme() === 'dark' ? 'lightgray' : 'darkgray'}
                 style={styles.input}
             />
             <Pressable onPress={handleSearch} style={styles.iconButton}>
